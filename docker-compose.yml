@@ -1,0 +1,37 @@
+version: "3.8"
+networks:
+  rotten_net:
+    driver: bridge
+volumes:
+  rotten_vol:
+services:
+  app:
+    image: luisroxis/rotten-potatoes:v1
+    build:
+      dockerfile: ./Dockerfile
+      context: ./src
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    networks:
+      - rotten_net
+    environment:
+      MONGODB_DB: admin
+      MONGODB_HOST: db
+      MONGODB_PORT: 27017
+      MONGODB_USERNAME: mongouser
+      MONGODB_PASSWORD: mongopwd
+
+  db:
+    image: mongo:4.4.3
+    restart: always
+    networks:
+      - rotten_net
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongouser
+      MONGO_INITDB_ROOT_PASSWORD: mongopwd
+    volumes:
+      - rotten_vol:/data/db
